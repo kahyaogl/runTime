@@ -11,7 +11,7 @@ from collections import deque
 
 # --- 1. Eğitim parametreleri ---
 window_size = 30
-epochs = 5
+epochs = 10
 batch_size = 32
 
 # --- 2. Veriyi yükle ve normalleştir ---
