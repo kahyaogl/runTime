@@ -11,7 +11,7 @@ from collections import deque
 
 # --- 1. Eğitim parametreleri ---
 window_size = 30
-epochs = 10
+epochs = 5
 batch_size = 32
 
 # --- 2. Veriyi yükle ve normalleştir ---
@@ -128,7 +128,8 @@ try:
                 anomaly_y.append(z_score)
 
             # Grafik güncelle
-            line_z.set_data(range(len(z_score)), z_scores)
+            line_mse.set_data(range(len(mse_values)),mse_values)
+            line_z.set_data(range(len(z_scores)), z_scores)
             scatter_anomalies.remove()
             scatter_anomalies = ax.scatter(anomaly_x, anomaly_y, color='red', label="Anomali")
 
