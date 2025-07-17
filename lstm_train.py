@@ -10,7 +10,7 @@ import time
 from collections import deque
 
 # --- 1. Eğitim parametreleri ---
-window_size = 30
+window_size =50
 epochs = 5
 batch_size = 32
 
@@ -58,7 +58,7 @@ joblib.dump(std_mse, "std_mse.pkl")
 # --- 6. Gerçek zamanlı anomali tespiti için hazırlık ---
 port = "COM4"  # Seri portunu kendi cihazına göre değiştir
 baud_rate = 230400
-threshold_z = 3
+threshold_z = 5
 
 data_window = deque(maxlen=window_size)
 
