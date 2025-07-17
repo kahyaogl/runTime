@@ -70,6 +70,7 @@ ax.set_ylabel("MSE")
 ax.set_title("Gerçek Zamanlı Anomali Tespiti (Z-score)")
 ax.grid(True)
 line_mse, = ax.plot([], [], label='MSE', color='blue')
+line_z, = ax.plot([], [],label='Z-score', color='purple')
 scatter_anomalies = ax.scatter([], [], color='red', label='Anomali')
 ax.legend()
 
@@ -88,6 +89,7 @@ print("🔵 Veri akışı başlatıldı...")
 
 # Zaman serisi verileri
 mse_values = []
+z_scores =[]
 anomaly_x = []
 anomaly_y = []
 t = 0
@@ -115,38 +117,44 @@ try:
             prediction = autoencoder.predict(scaled_seq)
             mse = np.mean(np.square(scaled_seq - prediction))
             z_score = (mse - mean_mse) / std_mse if std_mse > 0 else 0
+            z_scores.append(z_score)
 
             print(f"[{t}] MSE: {mse:.6f} | Z-score: {z_score:.2f}")
-            mse_values.append(mse)
+            z_scores.append(z_score)
+
 
             if z_score > threshold_z:
                 anomaly_x.append(t)
-                anomaly_y.append(mse)
+                anomaly_y.append(z_score)
 
             # Grafik güncelle
-            line_mse.set_data(range(len(mse_values)), mse_values)
+            line_z.set_data(range(len(z_score)), z_scores)
             scatter_anomalies.remove()
             scatter_anomalies = ax.scatter(anomaly_x, anomaly_y, color='red', label="Anomali")
 
             # X ve Y eksenlerini ayarla
             ax.set_xlim(max(0, t - 300), t + 10)
 
-            all_y = mse_values + anomaly_y
+            all_y = z_scores + anomaly_y
             if all_y:
-               y_min = min(all_y) - 0.01
-               y_max = max(all_y) + 0.
+               y_min = min(all_y) - 0.5
+               y_max = max(all_y) + 0.5
                
                limit = max(abs(y_min), abs(y_max))
                y_min = -limit
                y_max = limit
               # y_min = min(y_min, 0)  # y eksenini negatif değerlere doğru aç
             else:
-                y_min = -1.0
-                y_max = 1.0
-
-            ax.set_ylim(y_min, y_max)
+               ax.set_ylim(y_min, y_max)
             fig.canvas.draw()
             fig.canvas.flush_events()
+            # Var olan anomaly text varsa temizle
+            [child.remove() for child in ax.get_children() if isinstance(child, plt.Text) and child.get_text().startswith("Anomali Sayısı:")]
+
+            # Yeni anomali sayısını yazdır
+            ax.text(0.01, 0.95, f"Anomali Sayısı: {len(anomaly_x)}", transform=ax.transAxes,
+                   fontsize=12, color='red', verticalalignment='top')
+
 
             t += 1
 
